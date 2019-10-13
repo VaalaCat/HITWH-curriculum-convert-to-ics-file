@@ -43,7 +43,7 @@ def read_cul():
     global ClsLoc
     global ClsTime
     global ClsFreq
-    url = 'C:\\Users\\huidc\\Desktop\\大一上课表.xlsx'#input()
+    url = input("请将文件拖入框中")
     wb = xlrd.open_workbook(filename=url)
     cl = wb.sheet_by_index(0)
     ClsName = cl.col(0)
