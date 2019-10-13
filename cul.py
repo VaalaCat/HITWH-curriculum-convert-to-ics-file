@@ -1,9 +1,12 @@
+# coding=utf-8
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 import time
+import codecs
 from uuid import uuid1
 import xlrd
 import re
+import os
 
 WeekTable = {
     '一': '1',
@@ -95,27 +98,29 @@ def get_feq(cur):
     return LastWeek - FirstWeek
 
 def convert():
+    file = codecs.open('课表.ics', 'w', 'utf-8')
     BeginDay = date(2019, 9, 2)
     Today = date.today()
     #文件开头格式
-    print('''BEGIN:VCALENDAR
+    file.write(u'''BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//CQUT//Syllabus//CN''' )
+PRODID:-//CQUT//Syllabus//CN\n''' )
     #开始打印数据
     for i in range(0, len(ClsTime)):
         if time_trans(i, 'start') == False:
             continue
-        print('SUMMARY:%s' % ClsName[i].value)
-        print("DTSTART;VALUE=DATE-TIME:%s" % time_trans(i, 'start'))
-        print("DTEND;VALUE=DATE-TIME:%s" % time_trans(i, 'end'))
-        print("DTSTAMP;VALUE=DATE-TIME:%sZ" % time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())))
-        print(str(uuid1()) + '@HITWH')
-        print("RRULE:FREQ=WEEKLY;COUNT=%d;INTERVAL=1" % get_feq(i))
-        print("LOCATION:%s\nEND:VEVENT" % ClsLoc[i].value)
+        file.write(u"BEGIN:VEVENT\n")
+        file.write(u'SUMMARY:%s\n' % ClsName[i].value)
+        file.write(u"DTSTART;VALUE=DATE-TIME:%s\n" % time_trans(i, 'start'))
+        file.write(u"DTEND;VALUE=DATE-TIME:%s\n" % time_trans(i, 'end'))
+        file.write(u"DTSTAMP;VALUE=DATE-TIME:%sZ\n" % time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())))
+        file.write(u"UID:"+str(uuid1()) + '@HITWH\n')
+        file.write(u"RRULE:FREQ=WEEKLY;COUNT=%d;INTERVAL=1\n" % get_feq(i))
+        file.write(u"LOCATION:%s\nEND:VEVENT\n" % ClsLoc[i].value)
+    file.close()
 
 if __name__ == "__main__":
     read_cul()
-    print(time_trans(4,'start'))
     convert()
 
 #写到一半发现有人写过了qaq但是还是想写一下这个东西
