@@ -23,7 +23,9 @@ StartTime = {
     2: '1005',
     3: '1400',
     4: '1605',
-    5: '1640'
+    5: '1840',
+    6: '1935',
+    7: '2035'
 }
 
 EndTime = {
@@ -31,7 +33,9 @@ EndTime = {
     2: '1150',
     3: '1545',
     4: '1750',
-    5:''
+    5: '1930',
+    6: '2025',
+    7: '2125'
 }
 
 
@@ -78,9 +82,9 @@ def time_trans(cur,m):
     FirstWeek = int(fq[0:fq.index('-')])
     LastWeek = int(fq[fq.index('-') + 1 :])
     if FirstWeek >= WeekNow:
-        ans += str(timedelta(FirstWeek * 7 + int(week) - 1) + BeginDay)    
+        ans += str(timedelta((FirstWeek - 1) * 7 + int(week) - 1) + BeginDay)
     elif FirstWeek < WeekNow and WeekNow <= LastWeek:
-        ans += str(timedelta(WeekNow * 7 + int(week) - 1) + BeginDay)
+        ans += str(timedelta((WeekNow - 1) * 7 + int(week) - 1) + BeginDay)
     else:
         return False
     if m == 'start':
@@ -93,9 +97,10 @@ def time_trans(cur,m):
 def get_feq(cur):
     patternfq = re.compile(r'\d+-\d+')
     fq = patternfq.findall(ClsFreq[cur].value)[0]
-    FirstWeek = int(fq[0:fq.index('-')])
+    WeekNow = int(((date.today() - date(2019, 9, 2)).days) / 7) + 1
+    FirstWeek = int(fq[0:fq.index('-')]) if int(fq[0:fq.index('-')]) > WeekNow else WeekNow
     LastWeek = int(fq[fq.index('-') + 1 :])
-    return LastWeek - FirstWeek
+    return LastWeek - FirstWeek + 1
 
 def convert():
     file = codecs.open('课表.ics', 'w', 'utf-8')
