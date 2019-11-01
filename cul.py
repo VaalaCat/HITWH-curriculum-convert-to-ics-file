@@ -7,6 +7,7 @@ from uuid import uuid1
 import xlrd
 import re
 import os
+import requests
 
 WeekTable = {
     '一': '1',
@@ -68,7 +69,7 @@ def time_trans(cur,m):
     global ClsLoc
     global ClsTime
     global ClsFreq
-    ans=''
+    ans = ''
     #获取当前周数
     WeekNow = int(((date.today() - date(2019, 9, 2)).days) / 7) + 1
     BeginDay = date(2019, 9, 2)
