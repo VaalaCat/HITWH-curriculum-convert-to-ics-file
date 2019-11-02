@@ -1,4 +1,6 @@
 # coding=utf-8
+# 作为模块吧
+# 懒得复制一遍了
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 import time
@@ -46,6 +48,7 @@ ClsTime = []
 ClsFreq = []
 
 #表格文件读取
+
 def read_cul():
     global ClsName
     global ClsLoc
@@ -77,9 +80,9 @@ def time_trans(cur,m):
     patternwk = re.compile(r'[一二三四五六日]')
     patternles = re.compile(r'[0-9]')
     patternfq = re.compile(r'\d+-\d+')
-    week = WeekTable[patternwk.findall(ClsTime[cur].value)[0]]
-    les = patternles.findall(ClsTime[cur].value)[0]
-    fq = patternfq.findall(ClsFreq[cur].value)[0]
+    week = WeekTable[patternwk.findall(ClsTime[cur])[0]]
+    les = patternles.findall(ClsTime[cur])[0]
+    fq = patternfq.findall(ClsFreq[cur])[0]
     FirstWeek = int(fq[0:fq.index('-')])
     LastWeek = int(fq[fq.index('-') + 1 :])
     if FirstWeek >= WeekNow:
@@ -97,7 +100,7 @@ def time_trans(cur,m):
 
 def get_feq(cur):
     patternfq = re.compile(r'\d+-\d+')
-    fq = patternfq.findall(ClsFreq[cur].value)[0]
+    fq = patternfq.findall(ClsFreq[cur])[0]
     WeekNow = int(((date.today() - date(2019, 9, 2)).days) / 7) + 1
     FirstWeek = int(fq[0:fq.index('-')]) if int(fq[0:fq.index('-')]) > WeekNow else WeekNow
     LastWeek = int(fq[fq.index('-') + 1 :])
@@ -116,13 +119,13 @@ PRODID:-//CQUT//Syllabus//CN\n''' )
         if time_trans(i, 'start') == False:
             continue
         file.write(u"BEGIN:VEVENT\n")
-        file.write(u'SUMMARY:%s\n' % ClsName[i].value)
+        file.write(u'SUMMARY:%s\n' % ClsName[i])
         file.write(u"DTSTART;VALUE=DATE-TIME:%s\n" % time_trans(i, 'start'))
         file.write(u"DTEND;VALUE=DATE-TIME:%s\n" % time_trans(i, 'end'))
         file.write(u"DTSTAMP;VALUE=DATE-TIME:%sZ\n" % time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())))
         file.write(u"UID:"+str(uuid1()) + '@HITWH\n')
         file.write(u"RRULE:FREQ=WEEKLY;COUNT=%d;INTERVAL=1\n" % get_feq(i))
-        file.write(u"LOCATION:%s\nEND:VEVENT\n" % ClsLoc[i].value)
+        file.write(u"LOCATION:%s\nEND:VEVENT\n" % ClsLoc[i])
     file.close()
 
 if __name__ == "__main__":
