@@ -138,14 +138,26 @@ def getcul(curtext):
     # 分裂多周不连续课
     r = len(NormalCur)
     for i in range(0, r):
+        #处理单周课程
+        if NormalCur[i][7].find(',') == -1 and NormalCur[i][7].find('-') == -1:
+            NormalCur[i][7] = NormalCur[i][7] + '-' + NormalCur[i][7]
         if NormalCur[i][7].find(',') != -1:
-            RepPattern = re.compile(r',(\d+-\d+)')
+            NormalCur[i][7] += ','
+            RepPattern = re.compile(r',(.*),')
             temp = RepPattern.findall(NormalCur[i][7])
+
             for k in temp:
+                if k.find('-') == -1:
+                    k = k + '-' + k
+
                 NewClass = NormalCur[i][:7]
                 NewClass.append(k)
                 NormalCur.append(NewClass)
+
             NormalCur[i][7] = NormalCur[i][7][: NormalCur[i][7].find(',')]
+
+            if NormalCur[i][7].find('-') == -1:
+                NormalCur[i][7] = NormalCur[i][7] + '-' + NormalCur[i][7]
     return NormalCur
 
 # 将课表数据使用cul.py之前的函数建立ics文件
@@ -157,7 +169,7 @@ def to_file(cur):
         i[6] = NumberTable[i[6][: i[6].index(
             '-')]] + ' ' + i[6][i[6].index('-') + 1:]
         cul.ClsTime.append(i[6])
-    print('文件写入成功，请查看 课表.ics')
+    print('数据获取成功')
 
 # 退出登录
 def logout():

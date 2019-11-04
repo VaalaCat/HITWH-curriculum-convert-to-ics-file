@@ -82,6 +82,7 @@ def time_trans(cur,m):
     patternfq = re.compile(r'\d+-\d+')
     week = WeekTable[patternwk.findall(ClsTime[cur])[0]]
     les = patternles.findall(ClsTime[cur])[0]
+    #之前没有处理单周课程，现在处理一下
     fq = patternfq.findall(ClsFreq[cur])[0]
     FirstWeek = int(fq[0:fq.index('-')])
     LastWeek = int(fq[fq.index('-') + 1 :])
@@ -127,6 +128,7 @@ PRODID:-//CQUT//Syllabus//CN\n''' )
         file.write(u"RRULE:FREQ=WEEKLY;COUNT=%d;INTERVAL=1\n" % get_feq(i))
         file.write(u"LOCATION:%s\nEND:VEVENT\n" % ClsLoc[i])
     file.close()
+    print('课表.ics文件写入成功')
 
 if __name__ == "__main__":
     read_cul()

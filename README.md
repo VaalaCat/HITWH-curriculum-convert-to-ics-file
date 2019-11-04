@@ -23,7 +23,8 @@
 1. 将本项目clone到本地任意文件夹(中文路径似乎蜜汁有问题)
 2. 在项目文件夹内空白处按住shift后键单击```在此处打开powershell窗口```
 3. 在powershell窗口中输入```python bug.py```
-4. 享受你新得到的ics文件叭
+4. 按提示输入相关信息并回车
+5. 享受你新得到的ics文件叭
      
 by VaalaCat
 
