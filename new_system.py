@@ -7,13 +7,19 @@ file_path = input("请将下载的课表文件拖到这里")
 AllClasses_name = []
 AllTeachers_name = []
 
+grade = ''
+
 TransTable = {
     '1-2': '1',
     '3-4': '2',
     '5-6': '3',
     '7-8': '4',
     '9-10': '5',
-    '11-12': '6'
+    '11-12': '6',
+    '1': '大一',
+    '2': '大二',
+    '3': '大三',
+    '4': '大四'
 }
 
 # 从文件中获取数据并进行第一次处理
@@ -29,8 +35,21 @@ def get_data(data):
     lesson.pop()
     return lesson
 
-# 暴力获取一个格子中的课或者老师数量
 
+def check(data,prob):
+    cur = data.find(prob)
+    end = data[cur + len(prob)]
+    if cur == 0 and (end== '<' or end=='('):
+        return True
+    start = data[cur - 1]
+    if start == '>' and (end == '<'or end=='('):
+        return True
+    if (start == '>' or start == '，') and end == '[':
+        return True
+
+    return False
+
+# 暴力获取一个格子中的课或者老师数量
 
 def get_class_num(data, mode):
     num = 0
@@ -41,10 +60,21 @@ def get_class_num(data, mode):
     else:
         que = AllTeachers_name
     for i in que:
-        if i in data and (i in ans) == False:
+        if i in data and (i in ans) == False and check(data, i):
             num += 1
             ans.append(i)
     return (num, ans)
+
+
+def split_week(data):
+    data = data.split('，')
+    ans = []
+    for i in data:
+        if i.find('-') == -1:
+            ans.append(i + '-' + i)
+        else:
+            ans.append(i)
+    return ans
 
 # 整理数据为以前的规范
 
@@ -70,13 +100,13 @@ def process_data(lesson):
 
     # 首先将课表转换为一个列表
     for i in lesson[1:]:
-        for j in i:
-            if len(j) > 5:
-                ProcessedList.append([j, lesson[0][i.index(j)].replace("\r", "").replace(
-                    "\n", "").replace(" ", ""), i[0].replace("\r", "").replace("\n", "").replace(" ", "")])
+        for j in range(len(i)):
+            if len(i[j]) > 5:
+                ProcessedList.append([i[j], lesson[0][j].replace("\r", "").replace("\n", "").replace(
+                    " ", ""), i[0].replace("\r", "").replace("\n", "").replace(" ", "")])
     len1 = len(ProcessedList)
 
-    # 分割字符串
+    # 分割一格中的多个课程
     for i in range(len1):
         num, ans = get_class_num(ProcessedList[i][0], 'class')
         if num > 1:
@@ -104,22 +134,29 @@ def process_data(lesson):
             print("您的课表数据有误，请检查数据或联系开发者,出错数据：")
             print(i, num, ans)
             exit()
-        TeacherTimePattern = re.compile('[\u4e00-\u9fa5]+\[\d+-\d+\]')
-        TeacherTime = re.findall(TeacherTimePattern, i[0])
+        TeacherTimePattern = re.compile('[\u4e00-\u9fa5]+\[.*?\]')
+        TeacherTimeRaw = re.findall(TeacherTimePattern, i[0])
+        TeacherTime = []
+
+        # 处理多周不连续课程
+        for j in TeacherTimeRaw:
+            week = split_week(j[j.index('[') + 1 : j.index(']')])
+            TeacherTime.append([j[: j.index('[')], week])
+            
         LocPattern = re.compile(r'[A-Z]楼-\d+')
         Loc = re.findall(LocPattern, i[0])
 
         for j in TeacherTime:
-            cur = j.index('[')
-            ClsTeacher.append(j[:cur])
-            ClsFreq.append(j[cur:-1])
-            ClsName.append(ans[0])
-            if Loc == []:
-                Loc = ['']
-            ClsLoc.append(Loc[0])
-            ClsTime.append(i[1] + '第' + TransTable[i[2]] + '大节')
+            for k in j[1]:
+                ClsTeacher.append(j[0])
+                ClsFreq.append(k)
+                ClsName.append(ans[0])
+                if Loc == []:
+                    Loc = ['未知']
+                ClsLoc.append(Loc[0])
+                ClsTime.append(i[1] + '第' + TransTable[i[2]] + '大节')
 
-    return (ClsName,ClsLoc,ClsFreq,ClsTime,ClsTeacher)
+    return (ClsName, ClsLoc, ClsFreq, ClsTime, ClsTeacher)
 
 #:[\u4e00-\u9fa5]+匹配汉字
 
@@ -133,7 +170,9 @@ def init_database(path):
         ClassList.append(BaseData.row_values(i))
     return ClassList
 
-#链接到cul.py生成ics文件
+# 链接到cul.py生成ics文件
+
+
 def connect(ClsName, ClsLoc, ClsFreq, ClsTime, ClsTeacher):
     try:
         for i in range(len(ClsName)):
@@ -145,6 +184,7 @@ def connect(ClsName, ClsLoc, ClsFreq, ClsTime, ClsTeacher):
         cul.convert()
     except:
         print('错误')
+
 
 if __name__ == "__main__":
     data = xlrd.open_workbook(file_path)
