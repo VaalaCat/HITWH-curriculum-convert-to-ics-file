@@ -46,6 +46,7 @@ ClsName = []
 ClsLoc = []
 ClsTime = []
 ClsFreq = []
+Teacher = []
 
 #表格文件读取
 
@@ -74,8 +75,8 @@ def time_trans(cur,m):
     global ClsFreq
     ans = ''
     #获取当前周数
-    WeekNow = int(((date.today() - date(2019, 9, 2)).days) / 7) + 1
-    BeginDay = date(2019, 9, 2)
+    WeekNow = int(((date.today() - date(2020, 2, 24)).days) / 7) + 1#这是开学时间
+    BeginDay = date(2020, 2, 24)#这是开学时间
     #正则匹配获取数据
     patternwk = re.compile(r'[一二三四五六日]')
     patternles = re.compile(r'[0-9]')
@@ -102,14 +103,14 @@ def time_trans(cur,m):
 def get_feq(cur):
     patternfq = re.compile(r'\d+-\d+')
     fq = patternfq.findall(ClsFreq[cur])[0]
-    WeekNow = int(((date.today() - date(2019, 9, 2)).days) / 7) + 1
+    WeekNow = int(((date.today() - date(2020, 2, 24)).days) / 7) + 1#这是开学时间
     FirstWeek = int(fq[0:fq.index('-')]) if int(fq[0:fq.index('-')]) > WeekNow else WeekNow
     LastWeek = int(fq[fq.index('-') + 1 :])
     return LastWeek - FirstWeek + 1
 
 def convert():
     file = codecs.open('课表.ics', 'w', 'utf-8')
-    BeginDay = date(2019, 9, 2)
+    BeginDay = date(2020, 2, 24)#这是开学时间
     Today = date.today()
     #文件开头格式
     file.write(u'''BEGIN:VCALENDAR
@@ -124,7 +125,9 @@ PRODID:-//CQUT//Syllabus//CN\n''' )
         file.write(u"DTSTART;VALUE=DATE-TIME:%s\n" % time_trans(i, 'start'))
         file.write(u"DTEND;VALUE=DATE-TIME:%s\n" % time_trans(i, 'end'))
         file.write(u"DTSTAMP;VALUE=DATE-TIME:%sZ\n" % time.strftime('%Y%m%d%H%M%S', time.localtime(time.time())))
-        file.write(u"UID:"+str(uuid1()) + '@HITWH\n')
+        file.write(u"UID:" + str(uuid1()) + '@HITWH\n')
+        if Teacher != []:
+            file.write(u"DESCRIPTION:%s\n" % (Teacher[i]))
         file.write(u"RRULE:FREQ=WEEKLY;COUNT=%d;INTERVAL=1\n" % get_feq(i))
         file.write(u"LOCATION:%s\nEND:VEVENT\n" % ClsLoc[i])
     file.close()
