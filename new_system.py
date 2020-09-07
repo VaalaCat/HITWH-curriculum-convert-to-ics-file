@@ -134,7 +134,7 @@ def process_data(lesson):
         num, ans = get_class_num(i[0], 'class')
         # 防止出错qaq
         if num != 1:
-            print("您的课表数据有误，请检查数据库或联系开发者更新数据，出错数据：")
+            print("您的课表数据库有误，请自行在数据库中添加课程名称和老师或联系开发者更新数据，出错数据：")
             print(i, num, ans)
             exit()
         TeacherTimePattern = re.compile('[\u4e00-\u9fa5]+\[.*?\]')
@@ -201,9 +201,9 @@ def download(url):
 
 
 if __name__ == "__main__":
-    StartDay = input("请输入第一个周一的日期，用.分割，例如2020.9.14，若无输入则默认2020.9.14：").split('.')
+    StartDay = input("请输入第一个周一的日期，用.分割，例如2020.9.7，若无输入则默认2020.9.7：").split('.')
     if StartDay == ['']:
-        StartDay = "2020.9.14".split('.')
+        StartDay = "2020.9.7".split('.')
     cul.StartDay = date(int(StartDay[0]), int(StartDay[1]), int(StartDay[2]))
     data = xlrd.open_workbook(file_path)
     lesson = get_data(data)
