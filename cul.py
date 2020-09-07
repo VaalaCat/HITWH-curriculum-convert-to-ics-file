@@ -48,6 +48,8 @@ ClsTime = []
 ClsFreq = []
 Teacher = []
 
+StartDay = date(2020, 1, 1)
+
 #表格文件读取
 
 def read_cul():
@@ -75,8 +77,8 @@ def time_trans(cur,m):
     global ClsFreq
     ans = ''
     #获取当前周数
-    WeekNow = int(((date.today() - date(2020, 2, 24)).days) / 7) + 1#这是开学时间
-    BeginDay = date(2020, 2, 24)#这是开学时间
+    WeekNow = int(((date.today() - StartDay).days) / 7) + 1
+    BeginDay = StartDay
     #正则匹配获取数据
     patternwk = re.compile(r'[一二三四五六日]')
     patternles = re.compile(r'[0-9]')
@@ -103,14 +105,14 @@ def time_trans(cur,m):
 def get_feq(cur):
     patternfq = re.compile(r'\d+-\d+')
     fq = patternfq.findall(ClsFreq[cur])[0]
-    WeekNow = int(((date.today() - date(2020, 2, 24)).days) / 7) + 1#这是开学时间
+    WeekNow = int(((date.today() - StartDay).days) / 7) + 1
     FirstWeek = int(fq[0:fq.index('-')]) if int(fq[0:fq.index('-')]) > WeekNow else WeekNow
     LastWeek = int(fq[fq.index('-') + 1 :])
     return LastWeek - FirstWeek + 1
 
 def convert():
     file = codecs.open('课表.ics', 'w', 'utf-8')
-    BeginDay = date(2020, 2, 24)#这是开学时间
+    BeginDay = StartDay
     Today = date.today()
     #文件开头格式
     file.write(u'''BEGIN:VCALENDAR

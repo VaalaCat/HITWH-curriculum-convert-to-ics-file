@@ -1,8 +1,11 @@
 import xlrd
 import re
 import cul
+import urllib
+import os
+from datetime import date, timedelta
 
-file_path = input("请将下载的课表文件拖到这里")
+file_path = input("请将下载的课表文件拖到这里：")
 
 AllClasses_name = []
 AllTeachers_name = []
@@ -49,7 +52,7 @@ def check(data,prob):
 
     return False
 
-# 暴力获取一个格子中的课或者老师数量
+# 暴力获取一个格子中的课或者老师数量，返回值为数量和具体的老师或者课程列表
 
 def get_class_num(data, mode):
     num = 0
@@ -60,7 +63,7 @@ def get_class_num(data, mode):
     else:
         que = AllTeachers_name
     for i in que:
-        if i in data and (i in ans) == False and check(data, i):
+        if (i in data) and (i in ans) == False and check(data, i):
             num += 1
             ans.append(i)
     return (num, ans)
@@ -95,7 +98,7 @@ def process_data(lesson):
     ClsFreq = []
     ClsTeacher = []
 
-    ProcessedList = []
+    ProcessedList = [] # 课表转换出来的列表
     ans = []
 
     # 首先将课表转换为一个列表
@@ -131,7 +134,7 @@ def process_data(lesson):
         num, ans = get_class_num(i[0], 'class')
         # 防止出错qaq
         if num != 1:
-            print("您的课表数据有误，请检查数据或联系开发者,出错数据：")
+            print("您的课表数据有误，请检查数据库或联系开发者更新数据，出错数据：")
             print(i, num, ans)
             exit()
         TeacherTimePattern = re.compile('[\u4e00-\u9fa5]+\[.*?\]')
@@ -186,10 +189,27 @@ def connect(ClsName, ClsLoc, ClsFreq, ClsTime, ClsTeacher):
         print('错误')
 
 
+def download(url):
+    if url == "":
+        url = "http://oss.vaala.ink/tmp/class_list.xls"
+    print("开始下载...")
+    with urllib.request.urlopen(url) as web:
+        # 为保险起见使用二进制写文件模式，防止编码错误
+        with open('./class_list.xls', 'wb') as outfile:
+            outfile.write(web.read())
+    print("下载完成")
+
+
 if __name__ == "__main__":
+    StartDay = input("请输入第一个周一的日期，用.分割，例如2020.9.14，若无输入则默认2020.9.14：").split('.')
+    if StartDay == ['']:
+        StartDay = "2020.9.14".split('.')
+    cul.StartDay = date(int(StartDay[0]), int(StartDay[1]), int(StartDay[2]))
     data = xlrd.open_workbook(file_path)
     lesson = get_data(data)
-    ClassList = init_database('./2020_class_list.xls')
+    if os.path.exists('./class_list.xls') == False:
+        download(input("请输入课表数据库的url，若无输入则使用Vaala提供的数据库，更新数据库请删除class_list.xls文件："))
+    ClassList = init_database('./class_list.xls')
 
     for i in ClassList:
         AllClasses_name.append(i[5].replace(
