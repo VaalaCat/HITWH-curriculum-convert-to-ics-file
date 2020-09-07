@@ -11,9 +11,12 @@
 使用说明：
 
 1. 在本项目文件夹内按住shift右键单击空白处，点击在powershell中打开
-2. 输入`python new_system.py`
-3. 按程序要求提供所需数据，课表表格可在新系统中下载
-4. 享受你得到的ics文件叭
+2. 输入 `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U`
+3. 输入 `pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
+4. 输入 `pip install -r .\requirements.txt`
+5. 输入 `python new_system.py`
+6. 按程序要求提供所需数据，课表表格可在新系统中下载
+7. 享受你得到的ics文件叭
 
 -------------------------
 运行完成后请打开 课表.ics，然后利用日历软件导入即可，这里要注意一下gmail不能直接导入，可以使用outlook导入后再导出得到文件。后续会修正这个问题  
