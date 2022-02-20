@@ -125,9 +125,14 @@ def process_data(lesson):
             ProcessedList[i] = ['', '', '']
 
     # 删除多余的空数据
-    for i in ProcessedList:
-        if i[0] == '':
-            ProcessedList.pop(ProcessedList.index(i))
+    try:
+        while -1!=ProcessedList.index(['','','']):
+            ProcessedList.pop(ProcessedList.index(['','','']))
+    except:
+        print("课表提取完成，请检查课表内容")
+        print("--------------------------------")
+        print(ProcessedList)
+        print("--------------------------------")
 
     # 正则匹配处理数据
     for i in ProcessedList:
